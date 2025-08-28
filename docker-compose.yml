@@ -10,11 +10,14 @@ services:
     volumes:
       - jenkins-data:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
-      - /usr/bin/docker:/usr/bin/docker
-      - ~/.aws:/home/jenkins/.aws
     environment:
       - DOCKER_HOST=unix:///var/run/docker.sock
-    user: jenkins
+    user: "0:999"  # root user with docker group id
+    group_add:
+      - "999"  # docker group id to ensure jenkins user has docker access
+    command: >
+      bash -c "chgrp docker /var/run/docker.sock && chmod 666 /var/run/docker.sock && exec /bin/tini -- /usr/local/bin/jenkins.sh"
+
 volumes:
   jenkins-data:
 
