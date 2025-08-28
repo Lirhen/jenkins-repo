@@ -1,0 +1,10 @@
+workflow-aggregator
+pipeline-stage-view
+docker-workflow
+git
+ws-cleanup
+configuration-as-code
+job-dsl
+aws-credentials
+credentials-binding
+
