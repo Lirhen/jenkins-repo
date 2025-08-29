@@ -37,7 +37,7 @@ HTTP         TCP       8080    0.0.0.0/0 (or restricted IPs)
 
 #### Connect to EC2 Instance
 ```bash
-ssh -i your-key.pem ec2-user@your-jenkins-server-ip
+ssh -i your-key.pem ec2-user@JENKINS-SERVER-IP
 ```
 
 #### Install Docker
@@ -67,15 +67,15 @@ docker-compose --version
 #### Important: Re-login after Docker group addition
 ```bash
 exit
-ssh -i your-key.pem ec2-user@your-jenkins-server-ip
+ssh -i your-key.pem ec2-user@JENKINS-SERVER-IP
 ```
 
 ### 2. Deploy Jenkins Platform
 
 #### Clone Platform Repository
 ```bash
-git clone https://github.com/your-username/jenkins-platform-repo.git
-cd jenkins-platform-repo
+git clone git@github.com:Lirhen/jenkins-repo.git
+cd jenkins-repo
 ```
 
 #### Verify Docker Socket Permissions
@@ -111,7 +111,7 @@ docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
 ```
 
 #### Access Jenkins Web Interface
-1. Open browser: `http://your-ec2-public-ip:8080`
+1. Open browser: `http://JENKINS-PUBLIC-IP:8080`
 2. Enter the initial admin password
 3. Select "Install suggested plugins"
 4. Create first admin user
@@ -129,7 +129,7 @@ Navigate to **Manage Jenkins > Manage Plugins > Available** and install:
 
 #### Configure System Settings
 **Manage Jenkins > Configure System:**
-- **Jenkins URL**: `http://your-ec2-public-ip:8080`
+- **Jenkins URL**: `http://JENKINS-PUBLIC-IP:8080`
 - **GitHub Server**: Add GitHub.com (if needed)
 - **Global Tool Configuration**: Configure Git (usually auto-detected)
 
@@ -232,10 +232,31 @@ docker exec jenkins java -jar /var/jenkins_home/war/WEB-INF/jenkins-cli.jar -s h
 - **Authorization**: Logged-in users can do anything (or configure matrix-based security)
 - **CSRF Protection**: Enable with default crumb issuer
 
-### Secrets Management
-- Store sensitive data in Jenkins Credentials
-- Use IAM roles instead of hardcoded AWS keys when possible
-- Never commit secrets to Git
+### Webhook Security Enhancement (Optional)
+For additional security, configure webhook secret:
+
+#### In GitHub Repository:
+1. **Settings** → **Webhooks** → **Edit webhook**
+2. **Secret**: Generate random string (e.g., `openssl rand -hex 20`)
+3. **Save webhook**
+
+#### In Jenkins:
+**Manage Jenkins > Configure System > GitHub**:
+- Add GitHub Server with webhook secret
+- This validates webhook authenticity
+
+### Advanced Security (Production)
+```bash
+# Enable firewall (optional)
+sudo yum install -y firewalld
+sudo systemctl start firewalld
+sudo systemctl enable firewalld
+
+# Allow only necessary ports
+sudo firewall-cmd --permanent --add-port=22/tcp
+sudo firewall-cmd --permanent --add-port=8080/tcp
+sudo firewall-cmd --reload
+```
 
 ## Troubleshooting
 
