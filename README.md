@@ -74,7 +74,7 @@ ssh -i your-key.pem ec2-user@JENKINS-SERVER-IP
 
 #### Clone Platform Repository
 ```bash
-git clone git@github.com:Lirhen/jenkins-repo.git
+git clone git@github.com:Lirchen/jenkins-repo.git
 cd jenkins-repo
 ```
 
